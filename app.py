@@ -186,3 +186,106 @@ st.sidebar.markdown("<p class='muted-text' style='margin-bottom: 20px;'>Enter me
 # Model Selection
 model_choice = st.sidebar.selectbox("Select Model", ("XGBoost", "Random Forest"), index=0)
 st.sidebar.markdown("---")
+
+
+def user_input_features():
+    st.sidebar.subheader("Demographics")
+    
+    # Compact Layout: Age and Gender side-by-side
+    c1, c2 = st.sidebar.columns(2)
+    with c1:
+        age = st.number_input('Age (years)', 20, 90, 50)
+    with c2:
+        sex = st.selectbox('Gender', ('Male', 'Female'))
+    
+    st.sidebar.subheader("Clinical Symptoms")
+    
+    # Simplified Chest Pain Labels
+    cp_options = {
+        'No Pain (Asymptomatic)': 'ASY',
+        'Classic Heart Pain (Typical Angina)': 'TA',
+        'Atypical Heart Pain (Atypical Angina)': 'ATA',
+        'Non-Heart Pain (Non-Anginal)': 'NAP'
+    }
+    cp_label = st.sidebar.selectbox(
+        'Chest Pain Type', 
+        list(cp_options.keys())
+    )
+    cp_val = cp_options[cp_label]
+    
+    st.sidebar.subheader("Vitals")
+    
+    # Compact Layout: BP and Cholesterol
+    c3, c4 = st.sidebar.columns(2)
+    with c3:
+        resting_bp = st.slider('Resting BP', 80, 200, 120, help="Resting Blood Pressure (mm Hg)")
+    with c4:
+        cholesterol = st.slider('Cholesterol', 0, 600, 200, help="Serum Cholesterol (mm/dl)")
+    
+    # Simplified Fasting Blood Sugar
+    fbs_options = {
+        'Normal (< 120 mg/dl)': 0,
+        'High (> 120 mg/dl)': 1
+    }
+    fbs_label = st.sidebar.selectbox('Blood Sugar Level', list(fbs_options.keys()))
+    fbs_val = fbs_options[fbs_label]
+    
+    st.sidebar.subheader("Cardiac Tests")
+    
+    # Compact Layout: ECG and Max HR
+    c5, c6 = st.sidebar.columns(2)
+    with c5:
+        ecg_options = {
+            'Normal': 'Normal',
+            'Abnormal (ST)': 'ST',
+            'Thickened (LVH)': 'LVH'
+        }
+        ecg_label = st.selectbox('Resting ECG', list(ecg_options.keys()))
+        ecg_val = ecg_options[ecg_label]
+    with c6:
+        max_hr = st.slider('Max HR', 60, 220, 150, help="Maximum Heart Rate")
+    
+    # Simplified Exercise Angina
+    exang_options = {
+        'No': 'N',
+        'Yes': 'Y'
+    }
+    exang_label = st.sidebar.selectbox('Chest Pain During Exercise?', list(exang_options.keys()))
+    exang_val = exang_options[exang_label]
+    
+    st.sidebar.subheader("Advanced")
+    
+    # Compact Layout: Oldpeak and Slope
+    c7, c8 = st.sidebar.columns(2)
+    with c7:
+        oldpeak = st.number_input('ST Depression', -2.0, 6.0, 0.0, step=0.1, help="ECG Feature: ST Depression")
+    with c8:
+        st_slope_options = {
+            'Up (Normal)': 'Up',
+            'Flat (Warn)': 'Flat',
+            'Down (Bad)': 'Down'
+        }
+        st_slope_label = st.selectbox('ST Slope', list(st_slope_options.keys()))
+        st_slope_val = st_slope_options[st_slope_label]
+
+    # Mappings
+    sex_val = "M" if sex == "Male" else "F"
+
+    # Create dataframe
+    data = pd.DataFrame({
+        "Age": [age],
+        "Sex": [sex_val],
+        "ChestPainType": [cp_val],
+        "RestingBP": [resting_bp],
+        "Cholesterol": [cholesterol],
+        "FastingBS": [fbs_val],
+        "RestingECG": [ecg_val],
+        "MaxHR": [max_hr],
+        "ExerciseAngina": [exang_val],
+        "Oldpeak": [oldpeak],
+        "ST_Slope": [st_slope_val]
+    })
+    
+    return data
+
+input_df = user_input_features()
