@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 import shap
 from streamlit_shap import st_shap
 import warnings
+
 warnings.filterwarnings('ignore')
 
-# ---- Page Configuration ----
+# --- Page Configuration ---
 st.set_page_config(
-    page_title = "Heart Disease Predictor",
-    layout= "centered",
+    page_title="Heart Disease Predictor",
+    layout="centered",
     initial_sidebar_state="expanded"
 )
 
-# ---- Dark Theme CSS -----
-
+# --- Minimal Dark Theme CSS ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -157,7 +157,7 @@ st.markdown("""
 st.markdown("""
 <div style="margin-bottom: 30px;">
     <h1 style="margin-bottom: 8px;">Heart Disease Predictor</h1>
-    <p class="muted-text">Advanced AI-Powered Risk Assessment & Analysis</p>
+    <p class="muted-text">Advanced AI-Powered Risk Assessment</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -186,7 +186,6 @@ st.sidebar.markdown("<p class='muted-text' style='margin-bottom: 20px;'>Enter me
 # Model Selection
 model_choice = st.sidebar.selectbox("Select Model", ("XGBoost", "Random Forest"), index=0)
 st.sidebar.markdown("---")
-
 
 def user_input_features():
     st.sidebar.subheader("Demographics")
@@ -289,3 +288,93 @@ def user_input_features():
     return data
 
 input_df = user_input_features()
+
+# --- Main Content ---
+
+# Display Input Summary in a clean grid
+st.markdown("### Patient Profile")
+with st.container():
+    st.markdown("<div class='minimal-card'>", unsafe_allow_html=True)
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Age", f"{input_df['Age'][0]}")
+    c2.metric("BP", f"{input_df['RestingBP'][0]}")
+    c3.metric("Cholesterol", f"{input_df['Cholesterol'][0]}")
+    c4.metric("Max HR", f"{input_df['MaxHR'][0]}")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+st.markdown("### Risk Analysis")
+predict_button = st.button('Analyze Heart Disease Risk', type="primary", use_container_width=True)
+
+if predict_button:
+    active_model = rf_model if "Random Forest" in model_choice else xgb_model
+    
+    with st.spinner('Analyzing...'):
+        try:
+            # Prediction
+            prediction = active_model.predict(input_df)[0]
+            probability = active_model.predict_proba(input_df)[0]
+            
+            prob_disease = probability[1] * 100
+            prob_no_disease = probability[0] * 100
+            
+            # Result Card
+            if prediction == 0:
+                st.markdown(f"""
+                <div class="minimal-card risk-low">
+                    <h3 style="color: #3FB950; margin-bottom: 8px;">Low Risk Detected</h3>
+                    <p class="muted-text">The model predicts a lower probability ({prob_no_disease:.1f}%) of heart disease.</p>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="minimal-card risk-high">
+                    <h3 style="color: #F85149; margin-bottom: 8px;">High Risk Detected</h3>
+                    <p class="muted-text">The model predicts a higher probability ({prob_disease:.1f}%) of heart disease. Clinical consultation recommended.</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # Detailed Metrics
+            m1, m2 = st.columns(2)
+            with m1:
+                st.metric("Probability of Disease", f"{prob_disease:.1f}%")
+            with m2:
+                st.metric("Model Confidence", f"{max(prob_disease, prob_no_disease):.1f}%")
+            
+            # SHAP Explanation
+            st.markdown("---")
+            st.markdown("### Feature Contribution (SHAP)")
+            st.markdown("<p class='muted-text'>Explains which factors pushed the prediction towards High (Red) or Low (Blue) risk.</p>", unsafe_allow_html=True)
+            
+            try:
+                # Check for pipeline steps
+                if hasattr(active_model, "named_steps"):
+                    preprocessor = active_model.named_steps.get("preprocessor")
+                    classifier = active_model.named_steps.get("classifier")
+                    
+                    if preprocessor and classifier:
+                        input_transformed = preprocessor.transform(input_df)
+                        explainer = shap.TreeExplainer(classifier)
+                        shap_values = explainer.shap_values(input_transformed)
+                    else:
+                        explainer = shap.TreeExplainer(active_model)
+                        shap_values = explainer.shap_values(input_df)
+                else:
+                    explainer = shap.TreeExplainer(active_model)
+                    shap_values = explainer.shap_values(input_df)
+
+                # Handle SHAP return format
+                if isinstance(shap_values, list):
+                    shap_val = shap_values[1][0]
+                    base_val = explainer.expected_value[1]
+                else:
+                    shap_val = shap_values[0]
+                    base_val = explainer.expected_value
+
+                # Render SHAP plot
+                st_shap(shap.force_plot(base_val, shap_val, feature_names=feature_names, matplotlib=False), height=150)
+                
+            except Exception as e:
+                st.warning(f"SHAP explanation unavailable: {str(e)}")
+
+        except Exception as e:
+            st.error(f"Analysis Error: {str(e)}")
