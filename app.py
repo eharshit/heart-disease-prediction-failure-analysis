@@ -152,3 +152,11 @@ st.markdown("""
 
 </style>
 """, unsafe_allow_html=True)
+
+# --- Header ---
+st.markdown("""
+<div style="margin-bottom: 30px;">
+    <h1 style="margin-bottom: 8px;">Heart Disease Predictor</h1>
+    <p class="muted-text">Advanced AI-Powered Risk Assessment</p>
+</div>
+""", unsafe_allow_html=True)
