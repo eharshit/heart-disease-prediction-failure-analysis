@@ -157,6 +157,32 @@ st.markdown("""
 st.markdown("""
 <div style="margin-bottom: 30px;">
     <h1 style="margin-bottom: 8px;">Heart Disease Predictor</h1>
-    <p class="muted-text">Advanced AI-Powered Risk Assessment</p>
+    <p class="muted-text">Advanced AI-Powered Risk Assessment & Analysis</p>
 </div>
 """, unsafe_allow_html=True)
+
+# --- Model Loading ---
+@st.cache_resource
+def load_models():
+    try:
+        rf_model = joblib.load("models/rf_model.pkl")
+        xgb_model = joblib.load("models/xgb_model.pkl")
+        shap_background = joblib.load("models/shap_background.pkl")
+        feature_names = joblib.load("models/feature_names.pkl")
+        return rf_model, xgb_model, shap_background, feature_names, True
+    except FileNotFoundError:
+        return None, None, None, None, False
+
+rf_model, xgb_model, shap_background, feature_names, artifacts_loaded = load_models()
+
+if not artifacts_loaded:
+    st.error("Model artifacts not found. Please run the training notebook.")
+    st.stop()
+
+# --- Sidebar ---
+st.sidebar.header("Patient Data")
+st.sidebar.markdown("<p class='muted-text' style='margin-bottom: 20px;'>Enter medical information below</p>", unsafe_allow_html=True)
+
+# Model Selection
+model_choice = st.sidebar.selectbox("Select Model", ("XGBoost", "Random Forest"), index=0)
+st.sidebar.markdown("---")
