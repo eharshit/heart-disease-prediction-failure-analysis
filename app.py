@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import shap
 from streamlit_shap import st_shap
+from sklearn.pipeline import Pipeline
 import warnings
 
 warnings.filterwarnings('ignore')
