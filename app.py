@@ -155,12 +155,16 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Header ---
-st.markdown("""
-<div style="margin-bottom: 30px;">
-    <h1 style="margin-bottom: 8px;">Heart Disease Predictor</h1>
-    <p class="muted-text">Advanced AI-Powered Risk Assessment</p>
-</div>
-""", unsafe_allow_html=True)
+col1, col2 = st.columns([1, 6])
+with col1:
+    st.image("img/11424074.png", width=85)
+with col2:
+    st.markdown("""
+    <div style="margin-bottom: 30px;">
+        <h1 style="margin-bottom: 8px;">Heart Disease Predictor</h1>
+        <p class="muted-text">Advanced AI-Powered Risk Assessment</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 # --- Model Loading ---
 @st.cache_resource
