@@ -149,6 +149,8 @@ st.markdown("""
         white-space: nowrap !important; /* Force single line */
         background-color: #21262d !important; /* Distinct dark grey */
         border: 1px solid #30363d !important;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
     }
     div[data-testid="stButton"] button[kind="secondary"]:hover {
         background-color: #30363d !important;
@@ -209,7 +211,7 @@ with col2:
 
 # --- Dashboard Button (Below Header) ---
 # Separate row for the button to avoid crowding the title
-b_col1, b_col2 = st.columns([10, 2])
+b_col1, b_col2 = st.columns([9, 3])
 with b_col2:
     if st.button("View Dashboard", use_container_width=True):
         view_dashboard()
