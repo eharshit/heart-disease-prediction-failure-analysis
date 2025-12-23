@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
+import base64
 import matplotlib.pyplot as plt
 import shap
 from streamlit_shap import st_shap
@@ -135,11 +136,23 @@ st.markdown("""
     }
     
     /* Primary Button override */
-    div[data-testid="stButton"] button {
+    div[data-testid="stButton"] button[kind="primary"] {
         background-color: #1F6FEB;
     }
-    div[data-testid="stButton"] button:hover {
+    div[data-testid="stButton"] button[kind="primary"]:hover {
         background-color: #388BFD;
+    }
+
+    /* "View Dashboard" Button Specific Styling (Secondary buttons in header) */
+    div[data-testid="stButton"] button[kind="secondary"] {
+        font-weight: 700 !important; /* Bold */
+        white-space: nowrap !important; /* Force single line */
+        background-color: #21262d !important; /* Distinct dark grey */
+        border: 1px solid #30363d !important;
+    }
+    div[data-testid="stButton"] button[kind="secondary"]:hover {
+        background-color: #30363d !important;
+        border-color: #8b949e !important;
     }
     
     /* Risk Indicators */
@@ -154,8 +167,36 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# --- Dashboard Dialog ---
+@st.dialog("Power BI Dashboard", width="large")
+def view_dashboard():
+    # CSS to force a wider modal and minimize padding
+    st.markdown("""
+    <style>
+        div[data-testid="stDialog"] div[role="dialog"] {
+            width: 90vw !important;
+            max-width: 1600px !important;
+        }
+        div[data-testid="stDialog"] div[role="dialog"] button[aria-label="Close"] {
+            z-index: 999;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Base64 encode the image to embed it in HTML with constrained height
+    with open("img/Heart Disease Analysis Dashboard.png", "rb") as f:
+        data = base64.b64encode(f.read()).decode("utf-8")
+        
+    st.markdown(f"""
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <img src="data:image/png;base64,{data}" 
+                 style="max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 5px;">
+        </div>
+    """, unsafe_allow_html=True) 
+
 # --- Header ---
-col1, col2 = st.columns([1, 6])
+# Adjusted column weights to ensure title stays on one line and button is on the right
+col1, col2, col3 = st.columns([1, 9, 3])
 with col1:
     st.image("img/11424074.png", width=85)
 with col2:
@@ -165,6 +206,10 @@ with col2:
         <p class="muted-text">Advanced AI-Powered Risk Assessment</p>
     </div>
     """, unsafe_allow_html=True)
+with col3:
+    st.markdown('<div style="margin-top: 20px;"></div>', unsafe_allow_html=True) # Spacer for alignment
+    if st.button("View Dashboard", use_container_width=True):
+        view_dashboard()
 
 # --- Model Loading ---
 @st.cache_resource
