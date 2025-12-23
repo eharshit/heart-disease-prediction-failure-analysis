@@ -197,17 +197,22 @@ def view_dashboard():
     """, unsafe_allow_html=True) 
 
 # --- Header ---
-# Adjusted column weights to ensure title stays on one line (logo + title)
-col1, col2 = st.columns([1, 15])
-with col1:
-    st.image("img/11424074.png", width=85)
-with col2:
-    st.markdown("""
-    <div style="margin-bottom: 20px;">
-        <h1 style="margin-bottom: 8px;">Heart Disease Predictor</h1>
-        <p class="muted-text">Advanced AI-Powered Risk Assessment</p>
+# --- Header ---
+def get_base64_image(image_path):
+    with open(image_path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+logo_base64 = get_base64_image("img/11424074.png")
+
+st.markdown(f"""
+<div style="display: flex; align-items: center; margin-bottom: 20px;">
+    <img src="data:image/png;base64,{logo_base64}" width="60" style="margin-right: 20px; border-radius: 50%;">
+    <div>
+        <h1 style="margin: 0; font-size: 3rem;">Heart Disease Predictor</h1>
+        <p class="muted-text" style="margin: 0; font-size: 1.2rem;">Advanced AI-Powered Risk Assessment</p>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
 # --- Dashboard Button (Below Header) ---
 # Separate row for the button to avoid crowding the title
