@@ -34,3 +34,16 @@ The system generates patient-level risk predictions and pairs them with SHAP-bas
 *   **Records**: **299** patient records.
 *   **Purpose**: Used for mortality and survival analysis (Power BI).
 *   **Target**: `DEATH_EVENT`.
+
+
+## Machine Learning Pipeline
+The project follows a structured ML workflow implemented in the training notebook:
+
+1. **Data Preparation**: Dataset validation, missing-value checks, and basic outlier handling.
+
+2. **Preprocessing**: Categorical encoding and feature scaling using sklearn pipelines.
+3. **Train–Test Split**: Data split for model evaluation.
+4. **Model Training**: Ensemble models (Random Forest, XGBoost) trained for risk prediction.
+5. **Evaluation**: Performance measured using classification metrics and confusion matrix.
+6. **Explainability**: SHAP used for global and individual prediction explanations.
+7. **Deployment**: Trained models and preprocessors saved for Streamlit inference.
