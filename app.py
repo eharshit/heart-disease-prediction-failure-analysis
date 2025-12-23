@@ -195,19 +195,22 @@ def view_dashboard():
     """, unsafe_allow_html=True) 
 
 # --- Header ---
-# Adjusted column weights to ensure title stays on one line and button is on the right
-col1, col2, col3 = st.columns([1, 7, 5])
+# Adjusted column weights to ensure title stays on one line (logo + title)
+col1, col2 = st.columns([1, 15])
 with col1:
     st.image("img/11424074.png", width=85)
 with col2:
     st.markdown("""
-    <div style="margin-bottom: 30px;">
+    <div style="margin-bottom: 20px;">
         <h1 style="margin-bottom: 8px;">Heart Disease Predictor</h1>
         <p class="muted-text">Advanced AI-Powered Risk Assessment</p>
     </div>
     """, unsafe_allow_html=True)
-with col3:
-    st.markdown('<div style="margin-top: 20px;"></div>', unsafe_allow_html=True) # Spacer for alignment
+
+# --- Dashboard Button (Below Header) ---
+# Separate row for the button to avoid crowding the title
+b_col1, b_col2 = st.columns([10, 2])
+with b_col2:
     if st.button("View Dashboard", use_container_width=True):
         view_dashboard()
 
