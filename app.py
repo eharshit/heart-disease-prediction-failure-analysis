@@ -196,7 +196,7 @@ def view_dashboard():
 
 # --- Header ---
 # Adjusted column weights to ensure title stays on one line and button is on the right
-col1, col2, col3 = st.columns([1, 9, 3])
+col1, col2, col3 = st.columns([1, 7, 5])
 with col1:
     st.image("img/11424074.png", width=85)
 with col2:
